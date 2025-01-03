@@ -23,19 +23,20 @@ class StockItem(scrapy.Item):
     company_name = scrapy.Field()
     asset_class = scrapy.Field()
     last_sale_price = scrapy.Field()
+    exchange = scrapy.Field()
 
     # get the summary information
-    annualized_dividend = scrapy.Field()
-    current_yield = scrapy.Field()
+    annual_dividend = scrapy.Field()
+    dividend_yield = scrapy.Field()
     fifty_two_week_low = scrapy.Field()
     fifty_two_week_high = scrapy.Field()
 
     # list of DividendHistoryItem
-    dividend_payment_date = scrapy.Field()
-    ex_dividend_date = scrapy.Field()
     dividend_record = scrapy.Field()
-    dividend_yield = scrapy.Field()
 
     # dividend capture information
     next_dividend_amount = scrapy.Field()
     single_dividend_yield = scrapy.Field()
+
+    dividend_payment_date = scrapy.Field()
+    ex_dividend_date = scrapy.Field()

@@ -2,8 +2,7 @@
 
 This is a simple tool to help with your dividend capture strategy.
 
-The tool will calculate the `amount / last sale price`(I will call it `single_dividend_yield` in this document) 
-for those stock of which ex-dividend date is `target_date` in the nasdaq dividend calendar. 
+The tool will calculate the `amount / last sale price`(I will call it `single_dividend_yield` in this document)
 
 For example, for ex-dividend date 2024-12-12, [ULTY](https://www.nasdaq.com/market-activity/etf/ulty/dividend-history),
 the amount is $0.7092, and the last sale price is $9.34 when we run this tool. The `single_dividend_yield` is 0.7092 / 9.34 = 7.59%.
@@ -15,19 +14,32 @@ which can make you always win. But it is a profitable strategy if you use it cor
 
 ## How to use
 
-Just run the main.py file, and the result will be in the `result.json` file. The result will be sorted by the 
-`single_dividend_yield` in descending order.
+install the dependencies
+
+```shell
+pip install -r requirements.txt
+```
+
+Then run the main.py file, and you will get the result in the `/data/result.xlsx` file.
 
 ```shell
 python main.py
 ```
 
-And wait for the result.
+By default, the output is the dividend information for the ex-dividend date of tomorrow. You can change it in the `main.py` file.
 
-You can edit the `main.py` file to change the argument of the spider which collect and filter the data. But of course, the
-default argument is enough for most cases.
 
-## Arguments
+After the result is generated, open the `/data/result.xlsx` file, you will see the result like this:
+![](./doc/raw_result.png)
 
-- `target_date`: The ex-dividend date of which dividend you want to capture. Default: date of tomorrow, format: yyyy-mm-dd.
-- `key_filter`: Set the key filter, keys which are not in the filter will be ignored. Default: `symbol,ex_dividend_date,single_dividend_yield`
+sheet `info` is the information of each stock/etfs, and the others sheets start with `dr` are the dividend records for each stock/etfs.
+You should sort them by the `single_dividend_yield` column to find out the most profitable stock/etfs. By the way, you can use filter to
+ignore those stocks/etfs which exchange is Other OTC. Which means that you can't buy them in the Robinhood or other service provider.
+![](./doc/after_sort_and_filter.png)
+
+This is the data for ex-dividend date: 2025-01-03. And the best choice is ORI.
+
+# How to contribute
+
+Just fork this repo and create a pull request. I will review it as soon as possible.
+Pr, issues, and stars are welcome🥰.
