@@ -41,6 +41,10 @@ ignore those stocks/etfs which exchange is Other OTC. Which means that you can't
 
 This is the data for ex-dividend date: 2025-01-03. And the best choice is ORI.
 
+If you try to get the information of which ex-dividend date doesn't have any ex-dividend date. You may get an empty result. You can change
+the ex-div argument in main.py to get the result for the next available date. For example, during Friday, you should change the ex-div argument to 
+the date of next Monday.
+
 # How to contribute
 
 Just fork this repo and create a pull request. I will review it as soon as possible.
