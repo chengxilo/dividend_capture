@@ -10,8 +10,6 @@ from scrapy import Spider
 
 from stock.items import DividendHistoryItem, StockItem
 
-logging.getLogger('urllib3').setLevel(logging.INFO)
-
 
 def get_summary_url(symbol, asset_class):
     return f'https://api.nasdaq.com/api/quote/{symbol}/summary?assetclass={asset_class}'
@@ -42,12 +40,8 @@ class DividendsSpider(Spider):
             {"JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
              "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12}
 
-        # set the target date, default value is tomorrow
-        self.target_date = getattr(self, 'target_date', (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))
-
-        # set the key filter, default value is 'symbol,ex_dividend_date,single_dividend_yield',
-        # keys which are not in the filter will be ignored
-        self.key_filter = getattr(self, 'key_filter', 'symbol,ex_dividend_date,single_dividend_yield').split(',')
+        # set the target ex-dividend date,the default value is tomorrow
+        self.target_date = getattr(self, 'ex-div', (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d'))
 
     def start_requests(self):
         url = f'https://api.nasdaq.com/api/calendar/dividends?date={self.target_date}'
@@ -66,13 +60,11 @@ class DividendsSpider(Spider):
             symbol = row['symbol']
             href = f'https://www.nasdaq.com/market-activity/stocks/{symbol}/dividend-history'
             res = requests.get(url=href, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
-            pattern = r'https://www.nasdaq.com/market-activity/(etf|stocks)/([\^a-z-]+)/dividend-history'
+
             url = urllib.parse.unquote(res.url)
-            match = re.search(pattern, url)
-            if match is None:
-                print(match, res.url)
-            asset_class = match.group(1)
-            symbol = match.group(2)
+            splits = url.split('/')
+            asset_class = splits[-3]
+            symbol = splits[-2]
 
             symbol.replace('-', '^')
             # get the summary information
@@ -89,6 +81,7 @@ class DividendsSpider(Spider):
         stock_item['company_name'] = body['data']['companyName']
         stock_item['asset_class'] = body['data']['assetClass']
         stock_item['last_sale_price'] = body['data']['primaryData']['lastSalePrice']
+        stock_item['exchange'] = body['data']['exchange']
         yield scrapy.Request(
             url=get_summary_url(stock_item['symbol'], stock_item['asset_class']),
             callback=self.parse_summary,
@@ -100,8 +93,8 @@ class DividendsSpider(Spider):
         body = response.json()
 
         summary_data = body['data']['summaryData']
-        stock_item['annualized_dividend'] = summary_data['AnnualizedDividend']['value']
-        stock_item['current_yield'] = summary_data['Yield']['value']
+        stock_item['annual_dividend'] = summary_data['AnnualizedDividend']['value']
+        stock_item['dividend_yield'] = summary_data['Yield']['value']
         high_low_str = summary_data['FiftTwoWeekHighLow']['value']
         regex = re.compile(r'\$([0-9.]+)/\$([0-9.]+)')
         match = regex.match(high_low_str)
