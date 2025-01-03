@@ -19,6 +19,9 @@ def parse_scrapy_result(path):
     # drop the dividend_record column to save some basic information
     f.drop(columns=['dividend_record'], inplace=True)
 
+    # replace all the "N/A" with None
+    f.replace('N/A', None, inplace=True)
+
     with pd.ExcelWriter('data/result.xlsx') as w:
         # save the basic information
         f.to_excel(w, sheet_name='info', index=False)
@@ -27,6 +30,11 @@ def parse_scrapy_result(path):
         for i in range(len(dividend_record)):
             symbol = f['symbol'][i]
             record_f = pd.DataFrame(dividend_record[i])
+
+            # replace all the "N/A" with None
+            record_f.replace('N/A', None, inplace=True)
+
+            # write the dividend record to the Excel file
             record_f.to_excel(w, sheet_name=f'dr_{symbol}', index=False)
 
     print('The result is saved in data/result.xlsx')

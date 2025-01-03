@@ -32,6 +32,8 @@ By default, the output is the dividend information for the ex-dividend date of t
 After the result is generated, open the `/data/result.xlsx` file, you will see the result like this:
 ![](./doc/raw_result.png)
 
+You may realize that there are many empty cells. Most of those empty cells are N/A values in nasdaq.com.
+
 sheet `info` is the information of each stock/etfs, and the others sheets start with `dr` are the dividend records for each stock/etfs.
 You should sort them by the `single_dividend_yield` column to find out the most profitable stock/etfs. By the way, you can use filter to
 ignore those stocks/etfs which exchange is Other OTC. Which means that you can't buy them in the Robinhood or other service provider.
